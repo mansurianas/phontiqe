@@ -1,29 +1,43 @@
-pipeline{
-    agentany
-    stages{
-        stage("checkout"){
-            steps{
-                checkout scm
-                            }
-        }
-        stage("Test"){
-            steps{
-                sh 'sudo apt install npm'
-                sh 'npm test'
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/your-username/your-repo-name.git'
             }
         }
-        stage("build"){
-            steps{
+        stage('Build') {
+            steps {
+                sh 'npm install'
                 sh 'npm run build'
             }
         }
-
-            stage("build image"){
-                   steps{
-                         sh 'docker build -t my-node-app:1.0 . '
-                          }
-                   }
-
-
+        stage('Unit Tests') {
+            steps {
+                sh 'npm run test:unit'
+            }
+        }
+        stage('Integration Tests') {
+            steps {
+                sh 'npm run test:integration'
+            }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                sh 'docker build -t my-app-staging .'
+                sh 'docker stop my-app-staging || true'
+                sh 'docker rm my-app-staging || true'
+                sh 'docker run -d -p 3001:3000 my-app-staging'
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                sh 'docker build -t my-app-prod .'
+                sh 'docker stop my-app-prod || true'
+                sh 'docker rm my-app-prod || true'
+                sh 'docker run -d -p 3000:3000 my-app-prod'
+            }
+        }
     }
 }
