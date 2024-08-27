@@ -1,14 +1,13 @@
-FROM node:22.7.0
+FROM node:alpine
 
-WORKDIR /app
 
-COPY package*.json ./
+
+COPY ./ ./
 RUN npm install
 
-COPY . .
 
-RUN npm run build
+
 
 EXPOSE 8081
 
-CMD ["node", "index.js", "0.0.0.0", "8081"]
+CMD ["node", "start" ]
